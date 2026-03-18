@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Landsness · Kritsch Family Saga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:        #1a0a00;
+    --bark-deep:  #f5ead8;
+    --bark:       #e8d5b0;
+    --bark-mid:   #dbc49a;
+    --bark-light: #8b5520;
+    --gold:       #8a6010;
+    --gold-bright:#9a7015;
+    --gold-pale:  #4a2e00;
+    --blood:      #8b1a1a;
+    --blood-dark: #7a1515;
+    --moss:       #c8dcc2;
+    --moss-light: #2e5e28;
+    --ash:        #d5cfc8;
+    --ash-border: #7a7070;
+    --parch:      #1a0a00;
+    --parch-dim:  #3a2808;
+    --parch-dark: #5a3e18;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  @page { size: A1 portrait; margin: 0; }
+
+  body {
+    background: #e8dcc8;
+    font-family: 'IM Fell English', Georgia, serif;
+    color: var(--parch);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px;
+  }
+
+  .poster {
+    width: 900px;
+    background: #f5ead8;
+    position: relative;
+    padding: 70px 70px 50px;
+    overflow: hidden;
+  }
+  .poster::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(0,0,0,0.03) 4px, rgba(0,0,0,0.03) 5px),
+      repeating-linear-gradient(88deg, transparent, transparent 8px, rgba(160,100,0,0.025) 8px, rgba(160,100,0,0.025) 9px);
+    pointer-events: none; z-index: 0;
+  }
+  .poster > * { position: relative; z-index: 1; }
+
+  /* Borders */
+  .border-layer { position: absolute; pointer-events: none; z-index: 12; }
+  .border-gold-outer { inset: 12px; border: 5px solid var(--gold); }
+  .border-blood      { inset: 20px; border: 2px solid var(--blood); }
+  .border-gold-inner { inset: 25px; border: 1px solid var(--gold-bright); }
+
+  /* Full SVG frame overlay */
+  .knotwork-frame {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 13;
+  }
+
+  /* Rune strips */
+  .rune-strip {
+    position: absolute; top: 70px; bottom: 70px;
+    writing-mode: vertical-rl; font-size: 10px;
+    color: var(--parch-dark); letter-spacing: 8px;
+    opacity: 0.45; user-select: none; z-index: 2;
+  }
+  .rune-strip.left  { left: 32px; }
+  .rune-strip.right { right: 32px; transform: rotate(180deg); }
+
+  /* Title */
+  .title-block { text-align: center; padding: 6px 20px 16px; margin-bottom: 6px; }
+  .title-rune-row { font-size: 12px; color: var(--parch-dark); letter-spacing: 5px; margin-bottom: 8px; }
+  .title-main {
+    font-family: 'Cinzel Decorative', serif; font-size: 36px; font-weight: 700;
+    color: var(--gold-bright);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    line-height: 1.15; letter-spacing: 3px;
+  }
+  .title-sub {
+    font-family: 'Cinzel', serif; font-size: 20px; color: var(--gold);
+    letter-spacing: 5px; margin-top: 6px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  }
+  .title-tagline {
+    font-family: 'IM Fell English', serif; font-style: italic; font-size: 14px;
+    color: var(--parch-dim); margin-top: 10px; letter-spacing: 1px;
+  }
+
+  /* Knotwork dividers */
+  .knot-divider { width: 100%; display: block; margin: 4px 0; }
+
+  /* Generation labels */
+  .gen-section { margin-bottom: 4px; }
+  .gen-label { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .gen-numeral {
+    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700;
+    color: var(--gold-bright); background: #8b1a1a;
+    border: 1px solid var(--gold); padding: 3px 12px; white-space: nowrap; letter-spacing: 1px;
+  }
+  .gen-title {
+    font-family: 'IM Fell English', serif; font-style: italic; font-size: 13px;
+    color: var(--parch-dim); white-space: nowrap;
+  }
+  .gen-rule { flex: 1; height: 1px; background: linear-gradient(90deg, var(--bark-mid), transparent); }
+
+  .gen-row { display: flex; justify-content: center; align-items: flex-start; gap: 0; position: relative; }
+
+  /* Couples */
+  .couple { display: flex; align-items: center; }
+  .couple-connector { display: flex; align-items: center; justify-content: center; padding: 0 4px; position: relative; }
+  .couple-line { width: 30px; height: 2px; background: var(--gold); position: relative; }
+  .couple-sym { font-size: 11px; color: var(--gold-bright); position: absolute; top: -7px; left: 50%; transform: translateX(-50%); }
+
+  /* Person cards */
+  .card {
+    width: 175px; padding: 10px 10px 9px; border-radius: 4px; position: relative;
+    box-shadow: 3px 4px 12px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .card::before, .card::after {
+    content: ''; position: absolute; width: 12px; height: 12px; border-color: inherit; opacity: 0.55;
+  }
+  .card::before { top: 3px; left: 3px;     border-top: 2px solid; border-left: 2px solid; }
+  .card::after  { bottom: 3px; right: 3px; border-bottom: 2px solid; border-right: 2px solid; }
+
+  .card-norway   { background: var(--moss);     border: 2px solid var(--moss-light); border-color: var(--moss-light); }
+  .card-gold     { background: var(--bark);     border: 2px solid var(--gold);       border-color: var(--gold); }
+  .card-deceased { background: var(--ash);      border: 2px solid var(--ash-border); border-color: var(--ash-border); }
+  .card-living   { background: var(--bark-mid); border: 2px solid var(--bark-light); border-color: var(--bark-light); }
+
+  .card-top-stripe { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 4px 4px 0 0; }
+  .card-norway .card-top-stripe   { background: var(--moss-light); }
+  .card-gold .card-top-stripe     { background: var(--gold); }
+  .card-deceased .card-top-stripe { background: var(--ash-border); }
+  .card-living .card-top-stripe   { background: var(--bark-light); }
+
+  .card-badge { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px; margin-bottom: 3px; margin-top: 3px; display: none; }
+  .card-norway .card-badge { color: var(--moss-light); display: block; }
+  .card-gold .card-badge   { color: var(--gold);       display: block; }
+
+  .card-name {
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    color: var(--parch); line-height: 1.3; margin-bottom: 5px;
+  }
+  .card-gold .card-name   { color: var(--gold-bright); }
+  .card-norway .card-name { color: var(--gold-pale); }
+
+  .card-detail {
+    font-family: 'IM Fell English', serif; font-size: 11px;
+    color: var(--parch-dim); line-height: 1.6;
+  }
+
+  .card-small { width: 152px; }
+
+  /* Connector SVG areas — positioned absolutely, drawn by JS */
+  .conn-area {
+    position: relative;
+    width: 100%;
+    margin: 2px 0;
+  }
+  .conn-area svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  /* Bottom panels */
+  .bottom-panels { display: flex; justify-content: space-between; gap: 16px; margin-top: 14px; }
+  .panel {
+    flex: 1; background: #f5ead8; border: 2px solid var(--gold);
+    border-radius: 4px; padding: 12px 14px; text-align: center; position: relative; overflow: hidden;
+  }
+  .panel::before, .panel::after { content: ''; position: absolute; width: 16px; height: 16px; border-color: var(--gold); opacity: 0.45; }
+  .panel::before { top: 3px; left: 3px;     border-top: 1.5px solid; border-left: 1.5px solid; }
+  .panel::after  { bottom: 3px; right: 3px; border-bottom: 1.5px solid; border-right: 1.5px solid; }
+
+  .panel-icon { font-size: 22px; margin-bottom: 4px; }
+  .panel-title {
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    color: var(--gold-bright); letter-spacing: 2px;
+    margin-bottom: 6px; padding-bottom: 5px; border-bottom: 1px solid var(--bark-mid);
+  }
+  .panel-text {
+    font-family: 'IM Fell English', serif; font-style: italic; font-size: 11px;
+    color: var(--parch-dim); line-height: 1.7;
+  }
+  .legend-item { display: flex; align-items: center; gap: 10px; margin: 5px 0; text-align: left; }
+  .legend-swatch { width: 24px; height: 13px; border-radius: 2px; flex-shrink: 0; }
+  .legend-label { font-family: 'IM Fell English', serif; font-size: 11px; color: var(--parch-dim); }
+
+  .footer {
+    text-align: center; margin-top: 12px; font-size: 11px;
+    color: var(--parch-dark); letter-spacing: 3px; font-family: 'Cinzel', serif;
+  }
+
+  @media print {
+    body { padding: 0; background: #000; }
+    .poster { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="poster" id="poster">
+
+  <!-- Border layers -->
+  <div class="border-layer border-gold-outer"></div>
+  <div class="border-layer border-blood"></div>
+  <div class="border-layer border-gold-inner"></div>
+
+  <!-- SVG knotwork frame (purely decorative, no JS needed) -->
+  <svg class="knotwork-frame" viewBox="0 0 900 1400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="knot-tile" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+        <path d="M0,7 C4,7 5,4 11,4 C17,4 18,7 22,7" stroke="#8a6010" stroke-width="2.4" fill="none" stroke-opacity="0.6"/>
+        <path d="M0,15 C4,15 5,18 11,18 C17,18 18,15 22,15" stroke="#8a6010" stroke-width="2.4" fill="none" stroke-opacity="0.6"/>
+        <path d="M7,0 C7,4 4,5 4,11 C4,17 7,18 7,22" stroke="#9a7015" stroke-width="2.4" fill="none" stroke-opacity="0.5"/>
+        <path d="M15,0 C15,4 18,5 18,11 C18,17 15,18 15,22" stroke="#9a7015" stroke-width="2.4" fill="none" stroke-opacity="0.5"/>
+        <rect x="5.5" y="5.5" width="5" height="5" fill="#f5ead8" opacity="0.95"/>
+        <rect x="11.5" y="11.5" width="5" height="5" fill="#f5ead8" opacity="0.95"/>
+      </pattern>
+      <g id="triskele">
+        <circle cx="0" cy="0" r="28" fill="#8b1a1a" stroke="#8a6010" stroke-width="2.8"/>
+        <circle cx="0" cy="0" r="22" fill="none" stroke="#9a7015" stroke-width="1"/>
+        <circle cx="0" cy="0" r="14" fill="none" stroke="#8a6010" stroke-width="0.7" stroke-opacity="0.5"/>
+        <path d="M0,0 Q6,-8 12,-5 Q16,-2 14,4 Q12,10 6,10 Q2,10 0,0" fill="none" stroke="#9a7015" stroke-width="1.6" stroke-opacity="0.9"/>
+        <path d="M0,0 Q8,4 7,11 Q6,16 0,16 Q-6,16 -8,10 Q-10,4 0,0" fill="none" stroke="#9a7015" stroke-width="1.6" stroke-opacity="0.9"/>
+        <path d="M0,0 Q-8,-4 -10,-10 Q-11,-16 -6,-18 Q-1,-20 4,-14 Q8,-8 0,0" fill="none" stroke="#9a7015" stroke-width="1.6" stroke-opacity="0.9"/>
+        <circle cx="0" cy="0" r="4.5" fill="#8a6010"/>
+        <circle cx="0" cy="0" r="1.8" fill="#4a2e00"/>
+      </g>
+      <g id="mjolnir">
+        <rect x="-3.5" y="-16" width="7" height="13" fill="#8a6010" rx="1.5"/>
+        <rect x="-13" y="-16" width="26" height="10" fill="#8a6010" rx="1.5"/>
+        <rect x="-5" y="-7"  width="10" height="3.5" fill="#8b1a1a" rx="1"/>
+        <rect x="-2.5" y="-3.5" width="5" height="9" fill="#8a6010" rx="1"/>
+        <circle cx="0" cy="-11" r="2" fill="#9a7015" opacity="0.7"/>
+      </g>
+      <g id="valknut-c">
+        <path d="M0,-8 L-7,4 L7,4 Z" fill="none" stroke="#8a6010" stroke-width="2"/>
+        <path d="M-5,-4 L-12,8 L-1,8 Z" fill="none" stroke="#8a6010" stroke-width="2"/>
+        <path d="M5,-4 L1,8 L12,8 Z" fill="none" stroke="#8a6010" stroke-width="2"/>
+      </g>
+    </defs>
+    <!-- TOP strip -->
+    <rect x="12" y="12" width="876" height="28" fill="url(#knot-tile)" opacity="0.72"/>
+    <line x1="12" y1="12" x2="888" y2="12" stroke="#8a6010" stroke-width="4"/>
+    <line x1="12" y1="40" x2="888" y2="40" stroke="#8a6010" stroke-width="2"/>
+    <line x1="24" y1="15" x2="876" y2="15" stroke="#9a7015" stroke-width="0.8" opacity="0.55"/>
+    <!-- BOTTOM strip -->
+    <rect x="12" y="1360" width="876" height="28" fill="url(#knot-tile)" opacity="0.72"/>
+    <line x1="12" y1="1360" x2="888" y2="1360" stroke="#8a6010" stroke-width="2"/>
+    <line x1="12" y1="1388" x2="888" y2="1388" stroke="#8a6010" stroke-width="4"/>
+    <line x1="24" y1="1385" x2="876" y2="1385" stroke="#9a7015" stroke-width="0.8" opacity="0.55"/>
+    <!-- LEFT strip -->
+    <rect x="12" y="40" width="28" height="1320" fill="url(#knot-tile)" opacity="0.72"/>
+    <line x1="12" y1="40" x2="12" y2="1360" stroke="#8a6010" stroke-width="4"/>
+    <line x1="40" y1="40" x2="40" y2="1360" stroke="#8a6010" stroke-width="2"/>
+    <line x1="15" y1="55" x2="15" y2="1345" stroke="#9a7015" stroke-width="0.8" opacity="0.55"/>
+    <!-- RIGHT strip -->
+    <rect x="860" y="40" width="28" height="1320" fill="url(#knot-tile)" opacity="0.72"/>
+    <line x1="888" y1="40" x2="888" y2="1360" stroke="#8a6010" stroke-width="4"/>
+    <line x1="860" y1="40" x2="860" y2="1360" stroke="#8a6010" stroke-width="2"/>
+    <line x1="885" y1="55" x2="885" y2="1345" stroke="#9a7015" stroke-width="0.8" opacity="0.55"/>
+    <!-- Corner triskeles -->
+    <use href="#triskele" transform="translate(40,40)"/>
+    <use href="#triskele" transform="translate(860,40)"/>
+    <use href="#triskele" transform="translate(40,1360)"/>
+    <use href="#triskele" transform="translate(860,1360)"/>
+    <!-- Mjolnir flanking title -->
+    <use href="#mjolnir" transform="translate(100,125)"/>
+    <use href="#mjolnir" transform="translate(800,125)"/>
+    <!-- Valknut side accents -->
+    <use href="#valknut-c" transform="translate(26,700)" opacity="0.35"/>
+    <use href="#valknut-c" transform="translate(874,700)" opacity="0.35"/>
+  </svg>
+
+  <!-- Rune strips -->
+  <div class="rune-strip left">ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ ᛇ ᛈ ᛉ ᛊ ᛏ ᛒ ᛖ ᛗ ᛚ ᛜ ᛞ ᛟ ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ</div>
+  <div class="rune-strip right">ᛟ ᛞ ᛜ ᛚ ᛗ ᛖ ᛒ ᛏ ᛊ ᛉ ᛈ ᛇ ᛃ ᛁ ᚾ ᚺ ᚹ ᚷ ᚲ ᚱ ᚨ ᚦ ᚢ ᚠ ᛟ ᛞ ᛜ ᛚ ᛗ ᛖ ᛒ ᛏ ᛊ</div>
+
+  <!-- TITLE -->
+  <div class="title-block">
+    <div class="title-rune-row">ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ ᛇ ᛈ ᛉ ᛊ ᛏ ᛒ ᛖ ᛗ ᛚ ᛜ ᛞ ᛟ</div>
+    <div class="title-main">The Landsness · Kritsch</div>
+    <div class="title-sub">Family Saga</div>
+    <div class="title-tagline">ᚠ &nbsp; Six Generations &nbsp;·&nbsp; From the Fjords of Norway to the Heartlands of America &nbsp;·&nbsp; 1820 – Present &nbsp; ᚠ</div>
+  </div>
+
+  <!-- Reusable knot wave macro — inlined as a helper function via JS, drawn as SVG -->
+  <!-- Big title divider -->
+  <svg class="knot-divider" height="32" viewBox="0 0 760 32" preserveAspectRatio="xMidYMid meet">
+    <line x1="0" y1="16" x2="760" y2="16" stroke="#8a6010" stroke-width="2"/>
+    <line x1="0" y1="11" x2="760" y2="11" stroke="#9a7015" stroke-width="0.7" opacity="0.5"/>
+    <line x1="0" y1="21" x2="760" y2="21" stroke="#9a7015" stroke-width="0.7" opacity="0.5"/>
+    <path id="wave-big" d="" stroke="#8a6010" stroke-width="2.4" fill="none" stroke-opacity="0.78"/>
+    <circle cx="380" cy="16" r="13" fill="#f5ead8" stroke="#8a6010" stroke-width="1.4"/>
+    <path d="M380,8 L374,20 L386,20 Z"    fill="none" stroke="#9a7015" stroke-width="1.6"/>
+    <path d="M374,11 L368,23 L380,23 Z"   fill="none" stroke="#9a7015" stroke-width="1.3"/>
+    <path d="M386,11 L380,23 L392,23 Z"   fill="none" stroke="#9a7015" stroke-width="1.3"/>
+    <circle cx="10"  cy="16" r="6" fill="#8a6010"/><circle cx="10"  cy="16" r="2.5" fill="#f5ead8"/>
+    <circle cx="750" cy="16" r="6" fill="#8a6010"/><circle cx="750" cy="16" r="2.5" fill="#f5ead8"/>
+  </svg>
+
+  <!-- GEN I -->
+  <div class="gen-section">
+    <div class="gen-label">
+      <div class="gen-numeral">GEN · I</div>
+      <div class="gen-title">The Forebears &nbsp;·&nbsp; c. 1820 – 1924</div>
+      <div class="gen-rule"></div>
+    </div>
+    <div class="gen-row" id="row1">
+      <div class="couple">
+        <div class="card card-deceased" id="ole">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Ole Olsen</div>
+          <div class="card-detail">b. 1820 &nbsp;·&nbsp; d. 1889</div>
+        </div>
+        <div class="couple-connector"><div class="couple-line"><span class="couple-sym">✦</span></div></div>
+        <div class="card card-deceased" id="kari">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Kari Thorkelsdatter</div>
+          <div class="card-detail">Dates unknown</div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:40px;"></div>
+      <div class="couple">
+        <div class="card card-norway" id="johannes">
+          <div class="card-top-stripe"></div>
+          <div class="card-badge">NOREG ᚾ</div>
+          <div class="card-name">Johannes Nilson Maribu</div>
+          <div class="card-detail">b. 1851 &nbsp;·&nbsp; d. 1924</div>
+        </div>
+        <div class="couple-connector"><div class="couple-line"><span class="couple-sym">✦</span></div></div>
+        <div class="card card-norway" id="bronla">
+          <div class="card-top-stripe"></div>
+          <div class="card-badge">NOREG ᚾ</div>
+          <div class="card-name">Brønla Johannesdatter</div>
+          <div class="card-detail">b. 1856 &nbsp;·&nbsp; d. 1942</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connector placeholder: Gen1 → Gen2 -->
+  <div class="conn-area" id="conn12" style="height:50px;"></div>
+  <svg class="knot-divider" height="16" viewBox="0 0 760 16" preserveAspectRatio="xMidYMid meet"><line x1="0" y1="8" x2="760" y2="8" stroke="#3d1e00" stroke-width="1"/><path d="M20,5 C32,5 32,11 44,11 C56,11 56,5 68,5 C80,5 80,11 92,11 C104,11 104,5 116,5 C128,5 128,11 140,11 C152,11 152,5 164,5 C176,5 176,11 188,11 C200,11 200,5 212,5 C224,5 224,11 236,11 C248,11 248,5 260,5 C272,5 272,11 284,11 C296,11 296,5 308,5 C320,5 320,11 332,11 C344,11 344,5 356,5 C368,5 368,11 380,11 C392,11 392,5 404,5 C416,5 416,11 428,11 C440,11 440,5 452,5 C464,5 464,11 476,11 C488,11 488,5 500,5 C512,5 512,11 524,11 C536,11 536,5 548,5 C560,5 560,11 572,11 C584,11 584,5 596,5 C608,5 608,11 620,11 C632,11 632,5 644,5 C656,5 656,11 668,11 C680,11 680,5 692,5 C704,5 704,11 716,11 C728,11 728,5 740,5 C752,5 752,11 760,11" stroke="#5c3010" stroke-width="1.5" fill="none" stroke-opacity="0.7"/><rect x="42" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="90" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="138" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="186" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="234" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="282" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="330" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="378" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="426" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="474" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="522" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="570" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="618" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="666" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="714" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/></svg>
+
+  <!-- GEN II -->
+  <div class="gen-section">
+    <div class="gen-label">
+      <div class="gen-numeral">GEN · II</div>
+      <div class="gen-title">The Voyagers &nbsp;·&nbsp; Crossed the Atlantic 1895 ⛵</div>
+      <div class="gen-rule"></div>
+    </div>
+    <div class="gen-row" id="row2">
+      <div class="couple">
+        <div class="card card-gold" id="thomas">
+          <div class="card-top-stripe"></div>
+          <div class="card-badge">NOREG ᚾ · VOYAGER ⛵</div>
+          <div class="card-name">Thomas Landsness</div>
+          <div class="card-detail">b. Norway, 1871 · d. 1953<br>Immigrated USA 1895</div>
+        </div>
+        <div class="couple-connector"><div class="couple-line"><span class="couple-sym">✦</span></div></div>
+        <div class="card card-gold" id="bertha">
+          <div class="card-top-stripe"></div>
+          <div class="card-badge">Jelsa, Rogaland · VOYAGER ⛵</div>
+          <div class="card-name">Bertha Johannesdatter</div>
+          <div class="card-detail">b. Jelsa, Rogaland, 1880<br>d. 1959 · Immigrated 1895</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="conn-area" id="conn23" style="height:40px;"></div>
+  <svg class="knot-divider" height="16" viewBox="0 0 760 16" preserveAspectRatio="xMidYMid meet"><line x1="0" y1="8" x2="760" y2="8" stroke="#3d1e00" stroke-width="1"/><path d="M20,5 C32,5 32,11 44,11 C56,11 56,5 68,5 C80,5 80,11 92,11 C104,11 104,5 116,5 C128,5 128,11 140,11 C152,11 152,5 164,5 C176,5 176,11 188,11 C200,11 200,5 212,5 C224,5 224,11 236,11 C248,11 248,5 260,5 C272,5 272,11 284,11 C296,11 296,5 308,5 C320,5 320,11 332,11 C344,11 344,5 356,5 C368,5 368,11 380,11 C392,11 392,5 404,5 C416,5 416,11 428,11 C440,11 440,5 452,5 C464,5 464,11 476,11 C488,11 488,5 500,5 C512,5 512,11 524,11 C536,11 536,5 548,5 C560,5 560,11 572,11 C584,11 584,5 596,5 C608,5 608,11 620,11 C632,11 632,5 644,5 C656,5 656,11 668,11 C680,11 680,5 692,5 C704,5 704,11 716,11 C728,11 728,5 740,5 C752,5 752,11 760,11" stroke="#5c3010" stroke-width="1.5" fill="none" stroke-opacity="0.7"/><rect x="42" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="138" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="234" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="330" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="426" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="522" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="618" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="714" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/></svg>
+
+  <!-- GEN III -->
+  <div class="gen-section">
+    <div class="gen-label">
+      <div class="gen-numeral">GEN · III</div>
+      <div class="gen-title">First American Generation &nbsp;·&nbsp; 1920 – 2008</div>
+      <div class="gen-rule"></div>
+    </div>
+    <div class="gen-row" id="row3">
+      <div class="couple">
+        <div class="card card-deceased" id="gerhard">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Gerhard T. Landsness</div>
+          <div class="card-detail">b. Wisconsin, 1920<br>d. 1987</div>
+        </div>
+        <div class="couple-connector"><div class="couple-line"><span class="couple-sym">✦</span></div></div>
+        <div class="card card-deceased" id="violet">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Violet Mae Amacher</div>
+          <div class="card-detail">b. Wisconsin, 1927<br>d. 2008</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="conn-area" id="conn34" style="height:40px;"></div>
+  <svg class="knot-divider" height="16" viewBox="0 0 760 16" preserveAspectRatio="xMidYMid meet"><line x1="0" y1="8" x2="760" y2="8" stroke="#3d1e00" stroke-width="1"/><path d="M20,5 C32,5 32,11 44,11 C56,11 56,5 68,5 C80,5 80,11 92,11 C104,11 104,5 116,5 C128,5 128,11 140,11 C152,11 152,5 164,5 C176,5 176,11 188,11 C200,11 200,5 212,5 C224,5 224,11 236,11 C248,11 248,5 260,5 C272,5 272,11 284,11 C296,11 296,5 308,5 C320,5 320,11 332,11 C344,11 344,5 356,5 C368,5 368,11 380,11 C392,11 392,5 404,5 C416,5 416,11 428,11 C440,11 440,5 452,5 C464,5 464,11 476,11 C488,11 488,5 500,5 C512,5 512,11 524,11 C536,11 536,5 548,5 C560,5 560,11 572,11 C584,11 584,5 596,5 C608,5 608,11 620,11 C632,11 632,5 644,5 C656,5 656,11 668,11 C680,11 680,5 692,5 C704,5 704,11 716,11 C728,11 728,5 740,5 C752,5 752,11 760,11" stroke="#5c3010" stroke-width="1.5" fill="none" stroke-opacity="0.7"/><rect x="42" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="186" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="330" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="474" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="618" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/></svg>
+
+  <!-- GEN IV -->
+  <div class="gen-section">
+    <div class="gen-label">
+      <div class="gen-numeral">GEN · IV</div>
+      <div class="gen-title">The Heartland Generation &nbsp;·&nbsp; 1955 – present</div>
+      <div class="gen-rule"></div>
+    </div>
+    <div class="gen-row" id="row4">
+      <div class="couple">
+        <div class="card card-living" id="cheryl">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Cheryl Ann Landsness</div>
+          <div class="card-detail">b. Wisconsin, 1956<br>Living</div>
+        </div>
+        <div class="couple-connector"><div class="couple-line"><span class="couple-sym">✦</span></div></div>
+        <div class="card card-living" id="dennis">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Dennis William Kritsch</div>
+          <div class="card-detail">b. Indiana, 1955<br>Living</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="conn-area" id="conn45" style="height:50px;"></div>
+  <svg class="knot-divider" height="16" viewBox="0 0 760 16" preserveAspectRatio="xMidYMid meet"><line x1="0" y1="8" x2="760" y2="8" stroke="#3d1e00" stroke-width="1"/><path d="M20,5 C32,5 32,11 44,11 C56,11 56,5 68,5 C80,5 80,11 92,11 C104,11 104,5 116,5 C128,5 128,11 140,11 C152,11 152,5 164,5 C176,5 176,11 188,11 C200,11 200,5 212,5 C224,5 224,11 236,11 C248,11 248,5 260,5 C272,5 272,11 284,11 C296,11 296,5 308,5 C320,5 320,11 332,11 C344,11 344,5 356,5 C368,5 368,11 380,11 C392,11 392,5 404,5 C416,5 416,11 428,11 C440,11 440,5 452,5 C464,5 464,11 476,11 C488,11 488,5 500,5 C512,5 512,11 524,11 C536,11 536,5 548,5 C560,5 560,11 572,11 C584,11 584,5 596,5 C608,5 608,11 620,11 C632,11 632,5 644,5 C656,5 656,11 668,11 C680,11 680,5 692,5 C704,5 704,11 716,11 C728,11 728,5 740,5 C752,5 752,11 760,11" stroke="#5c3010" stroke-width="1.5" fill="none" stroke-opacity="0.7"/><rect x="42" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="234" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="426" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="618" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/></svg>
+
+  <!-- GEN V -->
+  <div class="gen-section">
+    <div class="gen-label">
+      <div class="gen-numeral">GEN · V</div>
+      <div class="gen-title">The Iowa Generation &nbsp;·&nbsp; 1984 – present</div>
+      <div class="gen-rule"></div>
+    </div>
+    <div class="gen-row" id="row5" style="justify-content:space-between;">
+      <div class="couple" id="couple-dk">
+        <div class="card card-living" id="derek">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Derek William Kritsch</div>
+          <div class="card-detail">b. Iowa, 1984 · Living</div>
+        </div>
+        <div class="couple-connector"><div class="couple-line"><span class="couple-sym">✦</span></div></div>
+        <div class="card card-living" id="kathryn">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Kathryn Howard</div>
+          <div class="card-detail">b. Iowa, 1987 · Living</div>
+        </div>
+      </div>
+      <div class="couple" id="couple-am">
+        <div class="card card-living" id="anson">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Anson Gerhard Kritsch</div>
+          <div class="card-detail">b. Iowa, 1988 · Living</div>
+        </div>
+        <div class="couple-connector"><div class="couple-line"><span class="couple-sym">✦</span></div></div>
+        <div class="card card-living" id="michelle">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Michelle Cheramy</div>
+          <div class="card-detail">b. Iowa, 1987 · Living</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="conn-area" id="conn56" style="height:50px;"></div>
+  <svg class="knot-divider" height="16" viewBox="0 0 760 16" preserveAspectRatio="xMidYMid meet"><line x1="0" y1="8" x2="760" y2="8" stroke="#3d1e00" stroke-width="1"/><path d="M20,5 C32,5 32,11 44,11 C56,11 56,5 68,5 C80,5 80,11 92,11 C104,11 104,5 116,5 C128,5 128,11 140,11 C152,11 152,5 164,5 C176,5 176,11 188,11 C200,11 200,5 212,5 C224,5 224,11 236,11 C248,11 248,5 260,5 C272,5 272,11 284,11 C296,11 296,5 308,5 C320,5 320,11 332,11 C344,11 344,5 356,5 C368,5 368,11 380,11 C392,11 392,5 404,5 C416,5 416,11 428,11 C440,11 440,5 452,5 C464,5 464,11 476,11 C488,11 488,5 500,5 C512,5 512,11 524,11 C536,11 536,5 548,5 C560,5 560,11 572,11 C584,11 584,5 596,5 C608,5 608,11 620,11 C632,11 632,5 644,5 C656,5 656,11 668,11 C680,11 680,5 692,5 C704,5 704,11 716,11 C728,11 728,5 740,5 C752,5 752,11 760,11" stroke="#5c3010" stroke-width="1.5" fill="none" stroke-opacity="0.7"/><rect x="42" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="138" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="282" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="474" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/><rect x="618" y="4" width="3" height="8" fill="#f5ead8" opacity="0.9"/></svg>
+
+  <!-- GEN VI -->
+  <div class="gen-section">
+    <div class="gen-label">
+      <div class="gen-numeral">GEN · VI</div>
+      <div class="gen-title">The Young Vikings &nbsp;·&nbsp; 2014 – present</div>
+      <div class="gen-rule"></div>
+    </div>
+    <div class="gen-row" id="row6" style="justify-content:space-between;align-items:flex-start;">
+      <div style="display:flex;gap:8px;" id="group-dk">
+        <div class="card card-small card-living" id="dylan">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Dylan Jacob Kritsch</div>
+          <div class="card-detail">b. Iowa, 2020 · Living</div>
+        </div>
+        <div class="card card-small card-living" id="emma">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Emma Lonnell Kritsch</div>
+          <div class="card-detail">b. Iowa, 2023 · Living</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;" id="group-am">
+        <div class="card card-small card-living" id="isabel">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Isabel Ann Kritsch</div>
+          <div class="card-detail">b. Iowa, 2014 · Living</div>
+        </div>
+        <div class="card card-small card-living" id="otto">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Otto Tilmon Kritsch</div>
+          <div class="card-detail">b. Iowa, 2019 · Living</div>
+        </div>
+        <div class="card card-small card-living" id="violet2">
+          <div class="card-top-stripe"></div>
+          <div class="card-name">Violet Barbara Kritsch</div>
+          <div class="card-detail">b. Iowa, 2023 · Living</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Closing divider -->
+  <svg class="knot-divider" height="32" style="margin-top:14px;" viewBox="0 0 760 32" preserveAspectRatio="xMidYMid meet">
+    <line x1="0" y1="16" x2="760" y2="16" stroke="#8a6010" stroke-width="2"/>
+    <line x1="0" y1="11" x2="760" y2="11" stroke="#9a7015" stroke-width="0.7" opacity="0.5"/>
+    <line x1="0" y1="21" x2="760" y2="21" stroke="#9a7015" stroke-width="0.7" opacity="0.5"/>
+    <path d="M10,11 C22,11 22,21 34,21 C46,21 46,11 58,11 C70,11 70,21 82,21 C94,21 94,11 106,11 C118,11 118,21 130,21 C142,21 142,11 154,11 C166,11 166,21 178,21 C190,21 190,11 202,11 C214,11 214,21 226,21 C238,21 238,11 250,11 C262,11 262,21 274,21 C286,21 286,11 298,11 C310,11 310,21 322,21 C334,21 334,11 346,11 C358,11 358,21 370,21 C382,21 382,11 394,11 C406,11 406,21 418,21 C430,21 430,11 442,11 C454,11 454,21 466,21 C478,21 478,11 490,11 C502,11 502,21 514,21 C526,21 526,11 538,11 C550,11 550,21 562,21 C574,21 574,11 586,11 C598,11 598,21 610,21 C622,21 622,11 634,11 C646,11 646,21 658,21 C670,21 670,11 682,11 C694,11 694,21 706,21 C718,21 718,11 730,11 C742,11 742,21 750,21"
+          stroke="#8a6010" stroke-width="2.4" fill="none" stroke-opacity="0.78"/>
+    <rect x="32"  y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="80"  y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="128" y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="176" y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="224" y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="272" y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="320" y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="368" y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="416" y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="464" y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="512" y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="560" y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="608" y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="656" y="10" width="4" height="12" fill="#f5ead8"/>
+    <rect x="704" y="10" width="4" height="12" fill="#f5ead8"/>
+    <circle cx="380" cy="16" r="13" fill="#f5ead8" stroke="#8a6010" stroke-width="1.4"/>
+    <path d="M380,8 L374,20 L386,20 Z"  fill="none" stroke="#9a7015" stroke-width="1.6"/>
+    <path d="M374,11 L368,23 L380,23 Z" fill="none" stroke="#9a7015" stroke-width="1.3"/>
+    <path d="M386,11 L380,23 L392,23 Z" fill="none" stroke="#9a7015" stroke-width="1.3"/>
+    <circle cx="10"  cy="16" r="6" fill="#8a6010"/><circle cx="10"  cy="16" r="2.5" fill="#f5ead8"/>
+    <circle cx="750" cy="16" r="6" fill="#8a6010"/><circle cx="750" cy="16" r="2.5" fill="#f5ead8"/>
+  </svg>
+
+  <!-- Panels -->
+  <div class="bottom-panels">
+    <!-- Combined Great Voyage + Migration Map panel -->
+    <div class="panel" style="flex:2; padding:12px 14px 10px;">
+      <div class="panel-title" style="margin-bottom:8px;">⛵ &nbsp; The Great Voyage &nbsp;·&nbsp; 1895 &nbsp;·&nbsp; Jelsa, Norway &rarr; Wisconsin &amp; Iowa, U.S.A.</div>
+      <div style="display:flex; gap:14px; align-items:flex-start;">
+
+        <!-- Leaflet real map -->
+        <div id="voyage-map" style="flex:1;min-width:0;height:210px;border:1.5px solid #8a6010;border-radius:3px;z-index:0;"></div>
+
+        <!-- Voyage text -->
+        <div style="width:158px;flex-shrink:0;">
+          <div class="panel-text" style="font-size:11px;line-height:1.75;">
+            <strong style="font-family:'Cinzel',serif;font-size:10px;color:#8a6010;display:block;margin-bottom:6px;">Thomas Landsness</strong>
+            Born Norway, 1871 &mdash; departed for America in 1895, settling in Wisconsin. He lived until 1953.
+            <br><br>
+            <strong style="font-family:'Cinzel',serif;font-size:10px;color:#8a6010;display:block;margin-bottom:6px;">Bertha Johannesdatter</strong>
+            Born Jelsa, Rogaland, 1880 &mdash; crossed the Atlantic that same year, 1895. She lived until 1959.
+            <br><br>
+            <em>Together they planted Norwegian roots that have grown into six generations of American family.</em>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-icon">⚔️</div>
+      <div class="panel-title">Name Echoes</div>
+      <div class="panel-text">
+        <em>Gerhard</em> lives on in Anson <em>Gerhard</em> Kritsch.<br><br>
+        <em>Tilmon</em> endures in Otto <em>Tilmon</em> Kritsch.<br><br>
+        <em>Violet</em> blooms again in <em>Violet</em> Barbara Kritsch.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ &nbsp;·&nbsp; Prepared for Family Heritage Night &nbsp;·&nbsp; ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ</div>
+</div>
+
+<script>
+// KEY FIX: use document.fonts.ready to ensure fonts are loaded before measuring
+// then use ResizeObserver as a fallback in case layout shifts after fonts load
+
+function getCenter(el) {
+  const r  = el.getBoundingClientRect();
+  const pr = document.getElementById('poster').getBoundingClientRect();
+  return {
+    x:   r.left - pr.left + r.width  / 2,
+    top: r.top  - pr.top,
+    bot: r.bottom - pr.top
+  };
+}
+
+function midCenter(a, b) {
+  const ca = getCenter(a), cb = getCenter(b);
+  return { x: (ca.x + cb.x) / 2, top: Math.min(ca.top, cb.top), bot: Math.max(ca.bot, cb.bot) };
+}
+
+function makeSVG(container) {
+  const s = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  s.setAttribute('width',  container.offsetWidth);
+  s.setAttribute('height', container.offsetHeight);
+  s.setAttribute('overflow','visible');
+  s.style.position = 'absolute';
+  s.style.top = '0'; s.style.left = '0';
+  container.innerHTML = '';
+  container.appendChild(s);
+  return s;
+}
+
+function line(svg, x1, y1, x2, y2, stroke, sw, dash) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg','line');
+  el.setAttribute('x1',x1.toFixed(1)); el.setAttribute('y1',y1.toFixed(1));
+  el.setAttribute('x2',x2.toFixed(1)); el.setAttribute('y2',y2.toFixed(1));
+  el.setAttribute('stroke', stroke || '#c8921a');
+  el.setAttribute('stroke-width', sw || 2);
+  if (dash) el.setAttribute('stroke-dasharray', dash);
+  svg.appendChild(el);
+}
+
+function dot(svg, x, y, r, fill) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  el.setAttribute('cx', x.toFixed(1)); el.setAttribute('cy', y.toFixed(1));
+  el.setAttribute('r', r); el.setAttribute('fill', fill || '#c8921a');
+  svg.appendChild(el);
+}
+
+function drawConnectors() {
+  const G = id => document.getElementById(id);
+  const pr = G('poster').getBoundingClientRect();
+
+  function cx(id) { const r = G(id).getBoundingClientRect(); return r.left - pr.left + r.width/2; }
+  function top(id){ const r = G(id).getBoundingClientRect(); return r.top - pr.top; }
+  function bot(id){ const r = G(id).getBoundingClientRect(); return r.bottom - pr.top; }
+  function connTop(id){ const r = G(id).getBoundingClientRect(); return r.top - pr.top; }
+  function connBot(id){ const r = G(id).getBoundingClientRect(); return r.bottom - pr.top; }
+
+  const COL  = '#8a6010';
+  const COL2 = '#7a4a1a';
+  const COL3 = '#2e5e28';
+
+  // ── conn12: Gen1 → Gen2 (Ole → Thomas, Johannes → Bertha) ──
+  {
+    const c = G('conn12');
+    const svg = makeSVG(c);
+    const h = c.offsetHeight;
+
+    const oleX    = cx('ole')      - pr.left;
+    const johX    = cx('johannes') - pr.left;
+    const thomasX = cx('thomas')   - pr.left;
+    const berthaX = cx('bertha')   - pr.left;
+
+    // Gold line: Ole → Thomas
+    line(svg, oleX,    0, thomasX, h, COL,  2, '5,3');
+    dot(svg,  oleX,    0, 4, COL);
+    dot(svg,  thomasX, h, 4, COL);
+
+    // Green line: Johannes → Bertha
+    line(svg, johX,    0, berthaX, h, COL3, 2, '5,3');
+    dot(svg,  johX,    0, 4, COL3);
+    dot(svg,  berthaX, h, 4, COL3);
+  }
+
+  // ── conn23: Gen2 → Gen3 (Thomas → Gerhard) ──
+  {
+    const c = G('conn23');
+    const svg = makeSVG(c);
+    const h = c.offsetHeight;
+    const fromX = cx('thomas')  - pr.left;
+    const toX   = cx('gerhard') - pr.left;
+    const mid   = h * 0.5;
+    line(svg, fromX, 0,   fromX, mid, COL, 2.5);
+    line(svg, fromX, mid, toX,   mid, COL, 2.5);
+    line(svg, toX,   mid, toX,   h,   COL, 2.5);
+    dot(svg, fromX, 0, 5, COL);
+    dot(svg, toX,   h, 5, COL);
+  }
+
+  // ── conn34: Gen3 → Gen4 (Gerhard → Cheryl) ──
+  {
+    const c = G('conn34');
+    const svg = makeSVG(c);
+    const h = c.offsetHeight;
+    const fromX = cx('gerhard') - pr.left;
+    const toX   = cx('cheryl')  - pr.left;
+    const mid   = h * 0.5;
+    line(svg, fromX, 0,   fromX, mid, COL2, 2);
+    line(svg, fromX, mid, toX,   mid, COL2, 2);
+    line(svg, toX,   mid, toX,   h,   COL2, 2);
+    dot(svg, fromX, 0, 4, COL2);
+    dot(svg, toX,   h, 4, COL2);
+  }
+
+  // ── conn45: Gen4 → Gen5 (Y-branch to Derek and Anson) ──
+  {
+    const c = G('conn45');
+    const svg = makeSVG(c);
+    const h = c.offsetHeight;
+    const fromX = (cx('cheryl') + cx('dennis')) / 2 - pr.left;
+    const derekX = cx('derek')  - pr.left;
+    const ansonX = cx('anson')  - pr.left;
+    const mid    = h * 0.5;
+
+    line(svg, fromX,  0,   fromX,  mid, COL2, 2);
+    line(svg, derekX, mid, ansonX, mid, COL2, 2);
+    line(svg, derekX, mid, derekX, h,   COL2, 2);
+    line(svg, ansonX, mid, ansonX, h,   COL2, 2);
+    dot(svg, fromX,  0, 4, COL2);
+    dot(svg, derekX, h, 4, COL2);
+    dot(svg, ansonX, h, 4, COL2);
+  }
+
+  // ── conn56: Gen5 → Gen6 (two Y-branches to children) ──
+  {
+    const c = G('conn56');
+    const svg = makeSVG(c);
+    const h = c.offsetHeight;
+    const derekX = cx('derek')   - pr.left;
+    const ansonX = cx('anson')   - pr.left;
+    const dylanX = cx('dylan')   - pr.left;
+    const emmaX  = cx('emma')    - pr.left;
+    const isabelX= cx('isabel')  - pr.left;
+    const ottoX  = cx('otto')    - pr.left;
+    const v2X    = cx('violet2') - pr.left;
+    const mid    = h * 0.5;
+    const dkChildMid = (dylanX + emmaX) / 2;
+    const amChildMid = (isabelX + v2X)  / 2;
+
+    // Derek branch → Dylan, Emma
+    line(svg, derekX,    0,   dkChildMid, mid,  COL2, 1.8);
+    line(svg, dylanX,    mid, emmaX,      mid,  COL2, 1.8);
+    line(svg, dylanX,    mid, dylanX,     h,    COL2, 1.8);
+    line(svg, emmaX,     mid, emmaX,      h,    COL2, 1.8);
+
+    // Anson branch → Isabel, Otto, Violet
+    line(svg, ansonX,    0,   amChildMid, mid,  COL2, 1.8);
+    line(svg, isabelX,   mid, v2X,        mid,  COL2, 1.8);
+    line(svg, isabelX,   mid, isabelX,    h,    COL2, 1.8);
+    line(svg, ottoX,     mid, ottoX,      h,    COL2, 1.8);
+    line(svg, v2X,       mid, v2X,        h,    COL2, 1.8);
+
+    [derekX, ansonX].forEach(x => dot(svg, x, 0, 4, COL2));
+    [dylanX, emmaX, isabelX, ottoX, v2X].forEach(x => dot(svg, x, h, 4, COL2));
+  }
+
+  // Title divider wave path (drawn now that we have width)
+  const pw = G('poster').offsetWidth - 140; // content width
+  const waveSvg = document.querySelector('#wave-big');
+  if (waveSvg) {
+    let d = `M10,11`;
+    const step = 48;
+    for (let x = 10; x < 750; x += step) {
+      d += ` C${x+step*0.25},11 ${x+step*0.25},21 ${x+step*0.5},21 C${x+step*0.75},21 ${x+step*0.75},11 ${x+step},11`;
+    }
+    waveSvg.setAttribute('d', d);
+  }
+}
+
+// Wait for fonts AND layout to be fully ready
+document.fonts.ready.then(() => {
+  // Small extra delay to let browser finalise layout after font swap
+  requestAnimationFrame(() => requestAnimationFrame(drawConnectors));
+});
+
+// Also redraw on resize
+window.addEventListener('resize', () => {
+  requestAnimationFrame(drawConnectors);
+});
+</script>
+<script>
+// ── Leaflet voyage map — loaded dynamically so it never crashes the page ──
+function initVoyageMap() {
+  try {
+    var jelsa     = [59.1,  6.05];
+    var wisconsin = [42.92, -89.22];
+
+    var map = L.map('voyage-map', {
+      zoomControl: false,
+      scrollWheelZoom: false,
+      attributionControl: true,
+      dragging: false,
+      doubleClickZoom: false,
+      boxZoom: false,
+      keyboard: false,
+    });
+
+    var bounds = L.latLngBounds([jelsa, wisconsin]).pad(0.12);
+    map.fitBounds(bounds);
+
+    // OpenStreetMap tiles — no API key needed, always works
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 6,
+    }).addTo(map);
+
+    // Custom pins
+    var redIcon = L.divIcon({
+      className: '',
+      html: '<div style="width:14px;height:14px;background:#8b1a1a;border:2.5px solid #fff;border-radius:50%;box-shadow:0 1px 5px rgba(0,0,0,0.6);"></div>',
+      iconSize: [14,14], iconAnchor: [7,7], popupAnchor: [0,-7]
+    });
+    var greenIcon = L.divIcon({
+      className: '',
+      html: '<div style="width:14px;height:14px;background:#2e5e28;border:2.5px solid #fff;border-radius:50%;box-shadow:0 1px 5px rgba(0,0,0,0.6);"></div>',
+      iconSize: [14,14], iconAnchor: [7,7], popupAnchor: [0,-7]
+    });
+
+    L.marker(jelsa, {icon: redIcon}).addTo(map)
+      .bindPopup('<b>Jelsa, Rogaland, Norway</b><br>Homeland of Thomas &amp; Bertha<br>Departed 1895').openPopup();
+
+    L.marker(wisconsin, {icon: greenIcon}).addTo(map)
+      .bindPopup('<b>Wisconsin / Iowa, U.S.A.</b><br>Where the family settled<br>after crossing in 1895');
+
+    // True great-circle arc
+    function greatCircle(lat1, lon1, lat2, lon2, n) {
+      var R = Math.PI / 180, D = 180 / Math.PI;
+      var f1=lat1*R, l1=lon1*R, f2=lat2*R, l2=lon2*R;
+      var d = 2*Math.asin(Math.sqrt(
+        Math.pow(Math.sin((f2-f1)/2),2) +
+        Math.cos(f1)*Math.cos(f2)*Math.pow(Math.sin((l2-l1)/2),2)));
+      var pts = [];
+      for (var i=0; i<=n; i++) {
+        var t=i/n;
+        var A=Math.sin((1-t)*d)/Math.sin(d), B=Math.sin(t*d)/Math.sin(d);
+        var x=A*Math.cos(f1)*Math.cos(l1)+B*Math.cos(f2)*Math.cos(l2);
+        var y=A*Math.cos(f1)*Math.sin(l1)+B*Math.cos(f2)*Math.sin(l2);
+        var z=A*Math.sin(f1)+B*Math.sin(f2);
+        pts.push([Math.atan2(z,Math.sqrt(x*x+y*y))*D, Math.atan2(y,x)*D]);
+      }
+      return pts;
+    }
+
+    var arc = greatCircle(jelsa[0],jelsa[1],wisconsin[0],wisconsin[1],80);
+
+    L.polyline(arc, {
+      color: '#8b1a1a', weight: 2.5,
+      dashArray: '8, 5', opacity: 0.9
+    }).addTo(map);
+
+  } catch(e) {
+    // If anything fails, show a fallback message — page never goes blank
+    var el = document.getElementById('voyage-map');
+    if (el) el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:serif;font-style:italic;color:#3a2808;font-size:12px;padding:16px;text-align:center;">Jelsa, Rogaland, Norway &rarr; Wisconsin &amp; Iowa, U.S.A.<br><br>~4,500 miles across the North Atlantic, 1895</div>';
+  }
+}
+
+// Dynamically load Leaflet CSS + JS so a CDN failure never blanks the page
+(function() {
+  try {
+    var css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+    document.head.appendChild(css);
+
+    var js = document.createElement('script');
+    js.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    js.onload = function() { initVoyageMap(); };
+    js.onerror = function() {
+      var el = document.getElementById('voyage-map');
+      if (el) el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:serif;font-style:italic;color:#3a2808;font-size:12px;padding:16px;text-align:center;">Jelsa, Rogaland, Norway &rarr; Wisconsin &amp; Iowa<br><br>~4,500 miles across the North Atlantic, 1895</div>';
+    };
+    document.body.appendChild(js);
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>
