@@ -767,96 +767,105 @@
 </div>
 
 <script>
-// KEY FIX: use document.fonts.ready to ensure fonts are loaded before measuring
-// then use ResizeObserver as a fallback in case layout shifts after fonts load
+// ── Connector lines: use offsetLeft/offsetTop (poster-relative, never viewport-relative) ──
 
-function getCenter(el) {
-  const r  = el.getBoundingClientRect();
-  const pr = document.getElementById('poster').getBoundingClientRect();
-  return {
-    x:   r.left - pr.left + r.width  / 2,
-    top: r.top  - pr.top,
-    bot: r.bottom - pr.top
-  };
+// Walk up the DOM summing offsetLeft/offsetTop until we reach the poster
+function posRelTo(el, ancestor) {
+  let x = 0, y = 0, node = el;
+  while (node && node !== ancestor) {
+    x += node.offsetLeft;
+    y += node.offsetTop;
+    node = node.offsetParent;
+  }
+  return { x, y, w: el.offsetWidth, h: el.offsetHeight };
 }
 
-function midCenter(a, b) {
-  const ca = getCenter(a), cb = getCenter(b);
-  return { x: (ca.x + cb.x) / 2, top: Math.min(ca.top, cb.top), bot: Math.max(ca.bot, cb.bot) };
+function cardCX(id) {
+  const poster = document.getElementById('poster');
+  const p = posRelTo(document.getElementById(id), poster);
+  return p.x + p.w / 2;
 }
 
 function makeSVG(container) {
-  const s = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   s.setAttribute('width',  container.offsetWidth);
   s.setAttribute('height', container.offsetHeight);
-  s.setAttribute('overflow','visible');
+  s.setAttribute('overflow', 'visible');
   s.style.position = 'absolute';
-  s.style.top = '0'; s.style.left = '0';
+  s.style.top = '0';
+  s.style.left = '0';
   container.innerHTML = '';
   container.appendChild(s);
   return s;
 }
 
 function line(svg, x1, y1, x2, y2, stroke, sw, dash) {
-  const el = document.createElementNS('http://www.w3.org/2000/svg','line');
-  el.setAttribute('x1',x1.toFixed(1)); el.setAttribute('y1',y1.toFixed(1));
-  el.setAttribute('x2',x2.toFixed(1)); el.setAttribute('y2',y2.toFixed(1));
-  el.setAttribute('stroke', stroke || '#c8921a');
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  el.setAttribute('x1', x1.toFixed(1)); el.setAttribute('y1', y1.toFixed(1));
+  el.setAttribute('x2', x2.toFixed(1)); el.setAttribute('y2', y2.toFixed(1));
+  el.setAttribute('stroke', stroke || '#8a6010');
   el.setAttribute('stroke-width', sw || 2);
   if (dash) el.setAttribute('stroke-dasharray', dash);
   svg.appendChild(el);
 }
 
 function dot(svg, x, y, r, fill) {
-  const el = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
   el.setAttribute('cx', x.toFixed(1)); el.setAttribute('cy', y.toFixed(1));
-  el.setAttribute('r', r); el.setAttribute('fill', fill || '#c8921a');
+  el.setAttribute('r', r);
+  el.setAttribute('fill', fill || '#8a6010');
   svg.appendChild(el);
 }
 
 function drawConnectors() {
-  const G = id => document.getElementById(id);
-  const pr = G('poster').getBoundingClientRect();
+  // Get the poster's left edge in the document so we can offset conn-area containers
+  const poster  = document.getElementById('poster');
+  const posterL = poster.getBoundingClientRect().left + window.scrollX;
 
-  function cx(id) { const r = G(id).getBoundingClientRect(); return r.left - pr.left + r.width/2; }
-  function top(id){ const r = G(id).getBoundingClientRect(); return r.top - pr.top; }
-  function bot(id){ const r = G(id).getBoundingClientRect(); return r.bottom - pr.top; }
-  function connTop(id){ const r = G(id).getBoundingClientRect(); return r.top - pr.top; }
-  function connBot(id){ const r = G(id).getBoundingClientRect(); return r.bottom - pr.top; }
+  // cx() — center X of a card, relative to poster left edge
+  // Uses offsetLeft traversal: immune to scroll and window width
+  const cx = id => cardCX(id);
+
+  // For conn-area containers we need their left edge relative to poster
+  function connAreaLeft(id) {
+    const poster = document.getElementById('poster');
+    return posRelTo(document.getElementById(id), poster).x;
+  }
 
   const COL  = '#8a6010';
   const COL2 = '#7a4a1a';
   const COL3 = '#2e5e28';
 
-  // ── conn12: Gen1 → Gen2 (Ole → Thomas, Johannes → Bertha) ──
+  // ── conn12: Ole → Thomas  |  Johannes → Bertha ──
   {
-    const c = G('conn12');
+    const c   = document.getElementById('conn12');
     const svg = makeSVG(c);
-    const h = c.offsetHeight;
+    const h   = c.offsetHeight;
+    const aL  = connAreaLeft('conn12');   // left edge of this conn-area relative to poster
 
-    const oleX    = cx('ole')      - pr.left;
-    const johX    = cx('johannes') - pr.left;
-    const thomasX = cx('thomas')   - pr.left;
-    const berthaX = cx('bertha')   - pr.left;
+    // All x values are relative to THIS conn-area's left edge
+    const oleX    = cx('ole')       - aL;
+    const johX    = cx('johannes')  - aL;
+    const thomasX = cx('thomas')    - aL;
+    const berthaX = cx('bertha')    - aL;
 
-    // Gold line: Ole → Thomas
     line(svg, oleX,    0, thomasX, h, COL,  2, '5,3');
     dot(svg,  oleX,    0, 4, COL);
     dot(svg,  thomasX, h, 4, COL);
 
-    // Green line: Johannes → Bertha
     line(svg, johX,    0, berthaX, h, COL3, 2, '5,3');
     dot(svg,  johX,    0, 4, COL3);
     dot(svg,  berthaX, h, 4, COL3);
   }
 
-  // ── conn23: Gen2 → Gen3 (Thomas → Gerhard) ──
+  // ── conn23: Thomas → Gerhard ──
   {
-    const c = G('conn23');
+    const c   = document.getElementById('conn23');
     const svg = makeSVG(c);
-    const h = c.offsetHeight;
-    const fromX = cx('thomas')  - pr.left;
-    const toX   = cx('gerhard') - pr.left;
+    const h   = c.offsetHeight;
+    const aL  = connAreaLeft('conn23');
+    const fromX = cx('thomas')  - aL;
+    const toX   = cx('gerhard') - aL;
     const mid   = h * 0.5;
     line(svg, fromX, 0,   fromX, mid, COL, 2.5);
     line(svg, fromX, mid, toX,   mid, COL, 2.5);
@@ -865,13 +874,14 @@ function drawConnectors() {
     dot(svg, toX,   h, 5, COL);
   }
 
-  // ── conn34: Gen3 → Gen4 (Gerhard → Cheryl) ──
+  // ── conn34: Gerhard → Cheryl ──
   {
-    const c = G('conn34');
+    const c   = document.getElementById('conn34');
     const svg = makeSVG(c);
-    const h = c.offsetHeight;
-    const fromX = cx('gerhard') - pr.left;
-    const toX   = cx('cheryl')  - pr.left;
+    const h   = c.offsetHeight;
+    const aL  = connAreaLeft('conn34');
+    const fromX = cx('gerhard') - aL;
+    const toX   = cx('cheryl')  - aL;
     const mid   = h * 0.5;
     line(svg, fromX, 0,   fromX, mid, COL2, 2);
     line(svg, fromX, mid, toX,   mid, COL2, 2);
@@ -880,14 +890,15 @@ function drawConnectors() {
     dot(svg, toX,   h, 4, COL2);
   }
 
-  // ── conn45: Gen4 → Gen5 (Y-branch to Derek and Anson) ──
+  // ── conn45: Cheryl+Dennis → Derek | Anson ──
   {
-    const c = G('conn45');
+    const c   = document.getElementById('conn45');
     const svg = makeSVG(c);
-    const h = c.offsetHeight;
-    const fromX = (cx('cheryl') + cx('dennis')) / 2 - pr.left;
-    const derekX = cx('derek')  - pr.left;
-    const ansonX = cx('anson')  - pr.left;
+    const h   = c.offsetHeight;
+    const aL  = connAreaLeft('conn45');
+    const fromX  = (cx('cheryl') + cx('dennis')) / 2 - aL;
+    const derekX =  cx('derek')  - aL;
+    const ansonX =  cx('anson')  - aL;
     const mid    = h * 0.5;
 
     line(svg, fromX,  0,   fromX,  mid, COL2, 2);
@@ -899,62 +910,46 @@ function drawConnectors() {
     dot(svg, ansonX, h, 4, COL2);
   }
 
-  // ── conn56: Gen5 → Gen6 (two Y-branches to children) ──
+  // ── conn56: Derek → Dylan,Emma  |  Anson → Isabel,Otto,Violet ──
   {
-    const c = G('conn56');
+    const c   = document.getElementById('conn56');
     const svg = makeSVG(c);
-    const h = c.offsetHeight;
-    const derekX = cx('derek')   - pr.left;
-    const ansonX = cx('anson')   - pr.left;
-    const dylanX = cx('dylan')   - pr.left;
-    const emmaX  = cx('emma')    - pr.left;
-    const isabelX= cx('isabel')  - pr.left;
-    const ottoX  = cx('otto')    - pr.left;
-    const v2X    = cx('violet2') - pr.left;
-    const mid    = h * 0.5;
-    const dkChildMid = (dylanX + emmaX) / 2;
-    const amChildMid = (isabelX + v2X)  / 2;
+    const h   = c.offsetHeight;
+    const aL  = connAreaLeft('conn56');
+    const derekX  = cx('derek')   - aL;
+    const ansonX  = cx('anson')   - aL;
+    const dylanX  = cx('dylan')   - aL;
+    const emmaX   = cx('emma')    - aL;
+    const isabelX = cx('isabel')  - aL;
+    const ottoX   = cx('otto')    - aL;
+    const v2X     = cx('violet2') - aL;
+    const mid     = h * 0.5;
+    const dkMid   = (dylanX + emmaX)   / 2;
+    const amMid   = (isabelX + v2X)    / 2;
 
-    // Derek branch → Dylan, Emma
-    line(svg, derekX,    0,   dkChildMid, mid,  COL2, 1.8);
-    line(svg, dylanX,    mid, emmaX,      mid,  COL2, 1.8);
-    line(svg, dylanX,    mid, dylanX,     h,    COL2, 1.8);
-    line(svg, emmaX,     mid, emmaX,      h,    COL2, 1.8);
+    line(svg, derekX,  0,   dkMid,   mid, COL2, 1.8);
+    line(svg, dylanX,  mid, emmaX,   mid, COL2, 1.8);
+    line(svg, dylanX,  mid, dylanX,  h,   COL2, 1.8);
+    line(svg, emmaX,   mid, emmaX,   h,   COL2, 1.8);
 
-    // Anson branch → Isabel, Otto, Violet
-    line(svg, ansonX,    0,   amChildMid, mid,  COL2, 1.8);
-    line(svg, isabelX,   mid, v2X,        mid,  COL2, 1.8);
-    line(svg, isabelX,   mid, isabelX,    h,    COL2, 1.8);
-    line(svg, ottoX,     mid, ottoX,      h,    COL2, 1.8);
-    line(svg, v2X,       mid, v2X,        h,    COL2, 1.8);
+    line(svg, ansonX,  0,   amMid,   mid, COL2, 1.8);
+    line(svg, isabelX, mid, v2X,     mid, COL2, 1.8);
+    line(svg, isabelX, mid, isabelX, h,   COL2, 1.8);
+    line(svg, ottoX,   mid, ottoX,   h,   COL2, 1.8);
+    line(svg, v2X,     mid, v2X,     h,   COL2, 1.8);
 
     [derekX, ansonX].forEach(x => dot(svg, x, 0, 4, COL2));
     [dylanX, emmaX, isabelX, ottoX, v2X].forEach(x => dot(svg, x, h, 4, COL2));
   }
-
-  // Title divider wave path (drawn now that we have width)
-  const pw = G('poster').offsetWidth - 140; // content width
-  const waveSvg = document.querySelector('#wave-big');
-  if (waveSvg) {
-    let d = `M10,11`;
-    const step = 48;
-    for (let x = 10; x < 750; x += step) {
-      d += ` C${x+step*0.25},11 ${x+step*0.25},21 ${x+step*0.5},21 C${x+step*0.75},21 ${x+step*0.75},11 ${x+step},11`;
-    }
-    waveSvg.setAttribute('d', d);
-  }
 }
 
-// Wait for fonts AND layout to be fully ready
+// Wait for fonts to load so card sizes are final, then draw
 document.fonts.ready.then(() => {
-  // Small extra delay to let browser finalise layout after font swap
   requestAnimationFrame(() => requestAnimationFrame(drawConnectors));
 });
 
-// Also redraw on resize
-window.addEventListener('resize', () => {
-  requestAnimationFrame(drawConnectors);
-});
+// Redraw if window resizes (poster is fixed width but conn-areas reflow)
+window.addEventListener('resize', () => requestAnimationFrame(drawConnectors));
 </script>
 <script>
 // ── Leaflet voyage map — loaded dynamically so it never crashes the page ──
