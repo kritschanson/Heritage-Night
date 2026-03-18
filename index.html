@@ -208,9 +208,36 @@
   }
 
   @media print {
-    body { padding: 0; background: #000; }
-    .poster { width: 100%; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    body {
+      padding: 0 !important;
+      margin: 0 !important;
+      background: #f5ead8 !important;
+    }
+
+    .poster {
+      width: 100% !important;
+      padding: 50px 50px 36px !important;
+      box-shadow: none !important;
+      page-break-inside: avoid;
+    }
+
+    /* Hide the interactive Leaflet map and show the static print map instead */
+    #voyage-map          { display: none !important; }
+    #voyage-map-print    { display: block !important; }
+
+    /* Make sure panel layout doesn't break across pages */
+    .bottom-panels       { page-break-inside: avoid; break-inside: avoid; }
+    .gen-section         { page-break-inside: avoid; break-inside: avoid; }
+    .panel               { page-break-inside: avoid; break-inside: avoid; }
+
+    /* Remove leaflet attribution */
+    .leaflet-control     { display: none !important; }
   }
+
+  /* Static print map — hidden on screen, shown when printing */
+  #voyage-map-print { display: none; }
 </style>
 </head>
 <body>
@@ -559,8 +586,157 @@
       <div class="panel-title" style="margin-bottom:8px;">⛵ &nbsp; The Great Voyage &nbsp;·&nbsp; 1895 &nbsp;·&nbsp; Jelsa, Norway &rarr; Wisconsin &amp; Iowa, U.S.A.</div>
       <div style="display:flex; gap:14px; align-items:flex-start;">
 
-        <!-- Leaflet real map -->
+        <!-- Leaflet real map (screen only) -->
         <div id="voyage-map" style="flex:1;min-width:0;height:210px;border:1.5px solid #8a6010;border-radius:3px;z-index:0;"></div>
+
+        <!-- Static print map (print only) — accurate North Atlantic with real proportions -->
+        <div id="voyage-map-print" style="flex:1;min-width:0;">
+          <svg viewBox="0 0 420 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:210px;display:block;border:1.5px solid #8a6010;border-radius:3px;">
+            <defs>
+              <marker id="pm-arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <polygon points="0,0 8,4 0,8" fill="#8b1a1a"/>
+              </marker>
+              <pattern id="pm-sea" x="0" y="0" width="5" height="5" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="2.5" x2="5" y2="2.5" stroke="#8ab4cc" stroke-width="0.3" opacity="0.5"/>
+              </pattern>
+            </defs>
+
+            <!-- Ocean -->
+            <rect width="420" height="210" fill="#c2d8ea"/>
+            <rect width="420" height="210" fill="url(#pm-sea)"/>
+
+            <!--
+              Projection covers lon -100 to +32, lat +35 to +73
+              x = (lon + 100) / 132 * 420
+              y = (73 - lat) / 38 * 210
+              Key points:
+                Jelsa (lon 6, lat 59):        x=338, y=77
+                Wisconsin (lon -89, lat 43):  x=35,  y=157
+                Greenland center (-42, 72):   x=186, y=6
+                Iceland (-18, 65):            x=257, y=42
+                UK/London (-0.1, 51.5):       x=318, y=112
+                Bergen Norway (5, 60):        x=335, y=72
+            -->
+
+            <!-- ── North America (east coast) ── -->
+            <path d="
+              M 0,68  L 12,62  L 24,58  L 36,56  L 46,58
+              L 54,64  L 58,72  L 58,82  L 54,94
+              L 50,108 L 48,122 L 50,136 L 52,150
+              L 50,164 L 44,174 L 36,178 L 26,174
+              L 18,164 L 12,150 L 8,134  L 6,118
+              L 4,100  L 2,84   Z
+            " fill="#ddd0a8" stroke="#8b6030" stroke-width="0.8"/>
+            <!-- Labrador -->
+            <path d="M 36,56 L 56,48 L 74,44 L 86,48 L 88,58 L 78,64 L 58,64 Z"
+                  fill="#ddd0a8" stroke="#8b6030" stroke-width="0.7"/>
+            <!-- Newfoundland -->
+            <path d="M 102,82 L 114,76 L 122,82 L 120,94 L 108,98 L 100,90 Z"
+                  fill="#ddd0a8" stroke="#8b6030" stroke-width="0.7"/>
+            <!-- Great Lakes -->
+            <path d="M 42,124 L 58,118 L 70,120 L 74,128 L 66,134 L 50,134 Z" fill="#9bbcd8" stroke="#6688aa" stroke-width="0.5"/>
+            <path d="M 50,132 L 58,128 L 62,136 L 58,146 L 50,148 L 46,140 Z" fill="#9bbcd8" stroke="#6688aa" stroke-width="0.5"/>
+            <ellipse cx="72" cy="144" rx="12" ry="4" fill="#9bbcd8" stroke="#6688aa" stroke-width="0.5"/>
+            <ellipse cx="88" cy="136" rx="8"  ry="3" fill="#9bbcd8" stroke="#6688aa" stroke-width="0.5"/>
+
+            <!-- Wisconsin / Iowa label -->
+            <text x="32" y="158" font-size="8"   font-family="serif" font-weight="bold" fill="#2e5e28" text-anchor="middle">Wisconsin</text>
+            <text x="32" y="168" font-size="7"   font-family="serif" fill="#2e5e28" text-anchor="middle">&amp; Iowa</text>
+
+            <!-- ── Greenland ── -->
+            <path d="
+              M 152,4  L 172,2  L 196,4  L 214,10 L 222,20
+              L 218,34 L 208,44 L 192,50 L 174,52
+              L 156,48 L 144,38 L 140,24 L 144,12 Z
+            " fill="#ddd0a8" stroke="#8b6030" stroke-width="0.8"/>
+            <text x="182" y="30" font-size="8" font-family="serif" fill="#3a2808" text-anchor="middle" font-style="italic">Greenland</text>
+
+            <!-- ── Iceland ── -->
+            <path d="M 244,48 L 258,42 L 272,46 L 276,56 L 268,64 L 252,66 L 242,58 Z"
+                  fill="#ddd0a8" stroke="#8b6030" stroke-width="0.7"/>
+            <text x="260" y="58" font-size="7" font-family="serif" fill="#3a2808" text-anchor="middle" font-style="italic">Iceland</text>
+
+            <!-- ── British Isles ── -->
+            <!-- Great Britain -->
+            <path d="M 300,104 L 312,96  L 320,100 L 322,114 L 316,126 L 306,130 L 298,122 L 296,110 Z"
+                  fill="#ddd0a8" stroke="#8b6030" stroke-width="0.7"/>
+            <!-- Ireland -->
+            <path d="M 286,110 L 294,106 L 298,116 L 292,124 L 284,120 L 282,112 Z"
+                  fill="#ddd0a8" stroke="#8b6030" stroke-width="0.7"/>
+
+            <!-- ── Scandinavia ── -->
+            <!-- Norway / Sweden body -->
+            <path d="
+              M 336,30  L 346,22  L 358,20  L 368,26
+              L 372,38  L 368,52  L 360,64  L 350,74
+              L 340,80  L 332,76  L 328,64  L 328,50
+              L 330,38 Z
+            " fill="#ddd0a8" stroke="#8b6030" stroke-width="0.9"/>
+            <!-- Norway west fjord coast (jagged) -->
+            <path d="M 330,38 L 324,46 L 320,56 L 318,68 L 320,78 L 328,84 L 332,76 L 328,64 L 328,50"
+                  fill="none" stroke="#8b6030" stroke-width="0.7"/>
+            <!-- Denmark -->
+            <path d="M 344,80 L 350,76 L 354,84 L 350,92 L 344,90 Z"
+                  fill="#ddd0a8" stroke="#8b6030" stroke-width="0.6"/>
+            <!-- Norway label -->
+            <text x="348" y="52" font-size="8" font-family="serif" fill="#3a2808" text-anchor="middle" font-style="italic">Norway</text>
+            <!-- Sweden label -->
+            <text x="366" y="46" font-size="6.5" font-family="serif" fill="#3a2808" text-anchor="middle" font-style="italic">Sweden</text>
+
+            <!-- ── Continental Europe (partial western edge) ── -->
+            <path d="
+              M 320,100 L 330,96  L 340,92  L 354,90  L 364,94
+              L 372,102 L 374,114 L 368,124 L 356,130
+              L 344,132 L 334,128 L 326,120 L 320,112 Z
+            " fill="#ddd0a8" stroke="#8b6030" stroke-width="0.7" opacity="0.85"/>
+            <!-- France/Iberia hint -->
+            <path d="M 294,134 L 308,128 L 320,130 L 326,142 L 320,154 L 308,158 L 296,152 L 288,142 Z"
+                  fill="#ddd0a8" stroke="#8b6030" stroke-width="0.7" opacity="0.75"/>
+
+            <!-- ── Route arc: Jelsa → Wisconsin (great circle) ── -->
+            <!-- Jelsa ≈ x=338,y=77  Wisconsin ≈ x=35,y=157 -->
+            <!-- Great circle dips north through the North Atlantic -->
+            <path d="M 338,77 C 320,55 280,36 240,30 C 200,24 160,32 120,50 C 90,64 60,90 38,154"
+                  fill="none" stroke="#8b1a1a" stroke-width="2.2"
+                  stroke-dasharray="7,4"
+                  marker-end="url(#pm-arr)"/>
+
+            <!-- ── Pins ── -->
+            <!-- Jelsa -->
+            <circle cx="338" cy="77" r="6" fill="#8b1a1a" stroke="white" stroke-width="1.5"/>
+            <circle cx="338" cy="77" r="2.2" fill="white"/>
+            <!-- Wisconsin -->
+            <circle cx="35"  cy="157" r="6" fill="#2e5e28" stroke="white" stroke-width="1.5"/>
+            <circle cx="35"  cy="157" r="2.2" fill="white"/>
+
+            <!-- ── Callout labels ── -->
+            <rect x="343" y="62" width="62" height="13" fill="white" fill-opacity="0.88" rx="2"/>
+            <text x="374" y="72" font-size="7" font-family="serif" font-weight="bold" fill="#8b1a1a" text-anchor="middle">Jelsa, Rogaland</text>
+
+            <!-- Year badge -->
+            <rect x="185" y="16" width="40" height="13" fill="white" fill-opacity="0.92" rx="2"/>
+            <text x="205" y="25.5" font-size="8" font-family="serif" font-weight="bold" fill="#8a6010" text-anchor="middle">1895 ⛵</text>
+
+            <!-- Atlantic label -->
+            <text x="178" y="110" font-size="10" font-family="serif" font-style="italic" fill="#3a6888" text-anchor="middle" opacity="0.7">North Atlantic Ocean</text>
+
+            <!-- Compass rose -->
+            <g transform="translate(395,185)">
+              <circle cx="0" cy="0" r="16" fill="white" fill-opacity="0.8" stroke="#8a6010" stroke-width="1"/>
+              <line x1="0" y1="-12" x2="0" y2="12" stroke="#8a6010" stroke-width="1.2"/>
+              <line x1="-12" y1="0" x2="12" y2="0" stroke="#8a6010" stroke-width="1.2"/>
+              <polygon points="0,-12 -3.5,-5 3.5,-5" fill="#8b1a1a"/>
+              <polygon points="0,12 -3.5,5 3.5,5"   fill="#8a6010" opacity="0.4"/>
+              <text x="0"  y="-14" font-size="7" font-family="serif" text-anchor="middle" font-weight="bold" fill="#3a2808">N</text>
+              <text x="0"  y="21"  font-size="6" font-family="serif" text-anchor="middle" fill="#3a2808">S</text>
+              <text x="15" y="3"   font-size="6" font-family="serif" text-anchor="middle" fill="#3a2808">E</text>
+              <text x="-15" y="3"  font-size="6" font-family="serif" text-anchor="middle" fill="#3a2808">W</text>
+            </g>
+
+            <!-- Distance note -->
+            <text x="210" y="204" font-size="6" font-family="serif" font-style="italic" fill="#3a2808" text-anchor="middle" opacity="0.8">~4,500 miles across the North Atlantic</text>
+          </svg>
+        </div>
 
         <!-- Voyage text -->
         <div style="width:158px;flex-shrink:0;">
